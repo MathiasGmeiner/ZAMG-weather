@@ -1,0 +1,9 @@
+name = ZAMG Weather Integration
+description = ZAMG Weather http://www.zamg.ac.at/
+core = 7.x
+package = Other
+
+files[] = zamgweather.install
+files[] = zamgweather.module
+
+configure = admin/config/system/zamgweather

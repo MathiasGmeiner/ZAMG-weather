@@ -1,0 +1,138 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function zamgweather_schema() {
+  $schema['zamgweather'] = array(
+    'fields' => array(
+      'id'  => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique forward ID',
+      ),
+
+      'icon_day' => array(
+        'description' => 'Icon: day',
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+      'text_day' => array(
+        'description' => 'Text: day',
+        'type' => 'varchar',
+        'length' => 355,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+      'tmp_max_day' => array(
+        'description' => 'max Temperature: day',
+        'type' => 'varchar',
+        'length' => 3,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+     'tmp_min_day' => array(
+        'description' => 'min Temperature: day',
+        'type' => 'varchar',
+        'length' => 3,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+      'icon_6' => array(
+        'description' => 'Icon: 6:00',
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+      'tmp_6' => array(
+        'description' => 'Temperature: 6:00',
+        'type' => 'varchar',
+        'length' => 3,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+      'icon_12' => array(
+        'description' => 'Icon: 12:00',
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+      'tmp_12' => array(
+        'description' => 'Temperature: 12:00',
+        'type' => 'varchar',
+        'length' => 3,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+      'icon_18' => array(
+        'description' => 'Icon: 18:00',
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+      'tmp_18' => array(
+        'description' => 'Temperature: 18:00',
+        'type' => 'varchar',
+        'length' => 3,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+      'date' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Date of forecast',
+      ),
+
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp',
+      )
+    ),
+    'primary key' => array('id'),
+  );
+
+  $schema['zamgweather_settings'] = array(
+    'fields' => array(
+      'xml_path' => array(
+          'description' => 'Path to the ZAMG XML-File',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+      ),
+      'icon_path' => array(
+          'description' => 'Path to the custom icons',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+      ),
+      'changed' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'Timestamp',
+      )
+    )
+  );
+
+  return $schema;
+}
