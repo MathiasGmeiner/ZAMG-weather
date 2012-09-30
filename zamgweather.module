@@ -1,25 +1,13 @@
 <?php
-define('ZAMGWEATHER_ICON_PATH', drupal_get_path('module', 'zamgweather') .'/img/weather_icons/');
-
 function zamgweather_get_weather() {
   $weather = array();
-
-  //settings
-  $icon = db_select('zamgweather_settings', 'zw')
-      ->fields('zw', array('icon_path'))
-      ->execute()
-      ->fetchAssoc();
-
-  if ($icon['icon_path']) {
-    $icon_path = $icon['icon_path'];
-  } else {
-    $icon_path = ZAMGWEATHER_ICON_PATH;
-  }
-  $weather['icon_path'] = $icon_path;
+  $weather['icon_path'] = variable_get('zamgweather_icon_path');
 
   $result = db_select('zamgweather', 'zw')
-      ->fields('zw')
-      ->execute();
+    ->fields('zw')
+    ->orderBy('created', 'DESC')
+    ->range(0,variable_get('zamgweather_forecast_days', 3))
+    ->execute();
   while($record = $result->fetchAssoc()) {
     $weather[] = $record;
   }
@@ -84,17 +72,12 @@ function zamgweather_save_xml_data() {
 }
 
 function zamgweather_get_xml() {
-  // get zamg_settings
-  $result = db_select('zamgweather_settings', 'zw')
-    ->fields('zw')
-    ->execute()
-    ->fetchAssoc();
 
-  if (!$result) {
+  if (variable_get('zamgweather_xml_path')=="") {
     drupal_set_message(t('Please check your settings for ZAMG weather.') . ' <a href="'. base_path() .'admin/config/system/zamgweather">ZAMG weather</a>', 'warning');
 
   } else {
-    $data = utf8_encode(file_get_contents($result['xml_path']));
+    $data = utf8_encode(file_get_contents(variable_get('zamgweather_xml_path')));
     $xml = simplexml_load_string($data);
     if (is_object($xml)) {
       return $xml;
@@ -133,72 +116,34 @@ function zamgweather_permission() {
 }
 
 function zamgweather_admin_settings_form($form_state) {
-  $result = db_select('zamgweather_settings', 'zw')
-    ->fields('zw')
-    ->execute()
-    ->fetchAssoc();
-
   $form['settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('General settings'),
   );
-  $form['settings']['xml_path'] = array(
+  $form['settings']['zamgweather_xml_path'] = array(
     '#title' => t('XML Path'),
     '#type' => 'textfield',
     '#size' => 65,
     '#maxlength' => 255,
     '#required' => TRUE,
-    '#default_value' => $result['xml_path'],
+    '#default_value' => variable_get('zamgweather_xml_path'),
     '#description' => t('The path for your Weather-XML-file.'),
   );
-  $form['settings']['icon_path'] = array(
+  $form['settings']['zamgweather_icon_path'] = array(
     '#title' => t('Icon Path'),
     '#type' => 'textfield',
     '#size' => 65,
     '#maxlength' => 255,
     '#required' => FALSE,
-    '#default_value' => $result['icon_path'],
+    '#default_value' => variable_get('zamgweather_icon_path', drupal_get_path('module', 'zamgweather') .'/img/weather_icons/'),
     '#description' => t('The path for your custom icons. Leave it empty for default icons.'),
   );
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#attributes' => array('class' => array('btn btn-primary')),
-    '#value' => t('Save'),
+  $form['settings']['zamgweather_forecast_days'] = array(
+    '#title' => t('x days of weather forecast'),
+    '#type' => 'select',
+    '#options' => array(1=>1,2=>2,3=>3),
+    '#required' => TRUE,
+    '#default_value' => variable_get('zamgweather_forecast_days', 3)
   );
-  return $form;
-}
-
-
-/**
- * save zamg weather settings
- * @param  [type] $form       [description]
- * @param  [type] $form_state [description]
- * @return [type]             [description]
- */
-function zamgweather_admin_settings_form_submit($form, &$form_state) {
-  $result = db_select('zamgweather_settings', 'zw')
-    ->fields('zw', array('changed'))
-    ->execute()
-    ->fetchAssoc();
-
-  if ($result['changed']) {
-    db_update('zamgweather_settings')
-      ->fields(array(
-        'xml_path' => $form_state['values']['xml_path'],
-        'icon_path' => $form_state['values']['icon_path'],
-        'changed' => time()
-      ))
-      ->condition('changed', $result['changed'], '=')
-      ->execute();
-  } else {
-    db_insert('zamgweather_settings')
-      ->fields(array(
-        'xml_path' => $form_state['values']['xml_path'],
-        'icon_path' => $form_state['values']['icon_path'],
-        'changed' => time()
-      ))
-      ->execute();
-  }
-
-  drupal_set_message(t('ZAMG weather settings saved.'));
+  return system_settings_form($form);
 }

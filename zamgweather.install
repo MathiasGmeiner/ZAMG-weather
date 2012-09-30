@@ -109,30 +109,14 @@ function zamgweather_schema() {
     'primary key' => array('id'),
   );
 
-  $schema['zamgweather_settings'] = array(
-    'fields' => array(
-      'xml_path' => array(
-          'description' => 'Path to the ZAMG XML-File',
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-      ),
-      'icon_path' => array(
-          'description' => 'Path to the custom icons',
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-      ),
-      'changed' => array(
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-          'description' => 'Timestamp',
-      )
-    )
-  );
-
   return $schema;
+}
+
+/**
+ * delete old settings table
+ */
+function zamgweather_update_7101() {
+  if (db_table_exists('zamgweather_settings')) {
+    db_drop_table('zamgweather_settings');
+  }
 }

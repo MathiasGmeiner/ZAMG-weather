@@ -1,6 +1,7 @@
 name = ZAMG Weather Integration
 description = ZAMG Weather http://www.zamg.ac.at/
 core = 7.x
+version = "7.x-1.0"
 package = Other
 
 files[] = zamgweather.install
